@@ -1,2 +1,4 @@
 *.Rproj
+.Rbuildignore
+.Rproj.user/
 
