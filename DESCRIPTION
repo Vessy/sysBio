@@ -2,9 +2,9 @@ Package: sysBio
 Type: Package
 Title: Systems biology modeling
 Version: 1.0
-Date: 2014-10-20
+Date: 2016-04-18
 Author: Vesna Memisevic <vesna@vesnam.com> 
 Maintainer: Vesna Memisevic <vesna@vesnam.com> 
 Description: Modeling dynamical biological systems using differential equations
-Imports: compiler, stringr, plyr, deSolve, ggplot2
+Imports: compiler, stringr, plyr, deSolve, ggplot2, FillespieSSA, reshape2
 License: GPL (>= 3)
