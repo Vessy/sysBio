@@ -1,7 +1,5 @@
 # sysBio
-R package for systems biology modeling
 
-## About 
 _sysBio_ is an open source package for modeling and simulation of biological systems. It provides ability to convert reactions into ordinary differential equations (ODEs) and ability to solve them via numerical integration. 
 Right now, _sysBio_ wiki page is the main source of documentation for the sysBio project. I am working on the reference manual and vignette, and I eventually plan to release it as a package on CRAN.
 
