@@ -1,15 +1,62 @@
-# makeModel function generates a set of differential equations from 
-# the reactions stored within the model.
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Creating a model
+#' 
+#' This function creates mathematical model of the system, a set 
+#' of differential equations that correspond to that mathematical 
+#' model, stochastic matrix, and propensity function. It also 
+#' transforms all defined rates, parameters, and rules into a 
+#' format required by the ODEs solver function.
+#' 
+#' @param x  model name (required)
+#'     
+#' @return This function adds updates model (given as an argument 
+#'     of the function) with information about mathematical model 
+#'     of the system, ODEs, stochastic matrix, and propensity 
+#'     function. This function also updates model's isChecked 
+#'     flag, as model is created based on the most recent data. 
+#'     It updates the following elements:
+#'     \itemize{
+#'     \item{model - mathematical model of the system}
+#'     \item{odes$equations - a set of ODEs that correspond to the mathematical model of the system (in format for ODEs solver)}
+#'     \item{odes$rates - reaction rates assignments (in format for ODEs solver)}
+#'     \item{odes$parameters - parameters assignments (in format for ODEs solver)}
+#'     \item{odes$rules - rules assignments (in format for ODEs solver)}
+#'     \item{stochMatrix - stochastic matrix (rows correspond to species, columns to reactions)}
+#'     \item{stochModel - propensity function (one equation for each reaction)}
+#'     \item{isChecked - flag set to 1}
+#'     }
+#'     
+#' @examples
+#' exmp <- newModel("This is an example of a new model")
+#' addMAreaction(exmp, react="A = null", "rf", "rb")
+#' addMAreaction(exmp, react="A + B -> 2*AB", "k", name="Forward AB")
+#' addMAreaction(exmp, react="AB -> null", "rAB")
+#' 
+#' addMAreactRate(exmp, "rf", "fixed", "1")
+#' addMAreactRate(exmp, "rb", "fixed", "0.75")
+#' addMAreactRate(exmp, "k", "fixed", "0.5")
+#' addMAreactRate(exmp, "rAB", "assigned", "p1*A")
+#' 
+#' addParameters(exmp, "p1", 0.75)
+#'  
+#' addSpecies(exmp, "A", 10)
+#' addSpecies(exmp, "B", 10)
+#' addSpecies(exmp, "AB", 0)
+#' 
+#' addRule(exmp, "rule B", "ODEs", "B=-0.1*AB")
+#' 
+#' # Show info about the model
+#' exmp
+#' 
+#' makeModel(exmp)
+#'   
+#' # Show info about the updated model
+#' exmp
+#' 
+#' @export
+#' 
 
-makeModel.function <- function(x){
+#makeModel.function <- function(x){
+makeModel <- function(x){
   
   if (!exists(deparse(substitute(x))))
     stop("Specified model does not exist!")
@@ -69,19 +116,19 @@ makeModel.function <- function(x){
     y$stochModel <- makeStModel(x, tmpDF2)
     
     # Summarize per species quantity (per reaction and product)
-    tmpDF1 <- ddply(tmpDF2, .variable=c("species", "reaction", "product", "odeSpecies", "odeProduct"), function(x) data.frame(tot=sum(as.numeric(x$stoch)*as.numeric(x$side))))     
+    tmpDF1 <- plyr::ddply(tmpDF2, .variable=c("species", "reaction", "product", "odeSpecies", "odeProduct"), function(x) data.frame(tot=sum(as.numeric(x$stoch)*as.numeric(x$side))))     
     
     # Remove those with total equal to zero (that canceled out)
     tmpDF2 <- tmpDF1[as.numeric(tmpDF1$tot) != 0, ]
     
     # Summarize per species and reactions (in the form reaction times product)
-    tmpDF1 <- ddply(tmpDF2, .variable=c("species", "reaction", "odeSpecies"), function(x) data.frame(t1=ifelse(x$tot == 1, paste(as.character(x$reaction), x$product, sep="*"), ifelse(x$tot == -1, paste("-", paste(as.character(x$reaction),x$product, sep="*"), sep=""), paste(as.character(x$tot), as.character(x$reaction), x$product, sep="*"))), t2=ifelse(x$tot == 1, paste(as.character(x$reaction), x$odeProduct, sep="*"), ifelse(x$tot == -1, paste("-", paste(as.character(x$reaction),x$odeProduct, sep="*"), sep=""), paste(as.character(x$tot), as.character(x$reaction), x$odeProduct, sep="*")))))
+    tmpDF1 <- plyr::ddply(tmpDF2, .variable=c("species", "reaction", "odeSpecies"), function(x) data.frame(t1=ifelse(x$tot == 1, paste(as.character(x$reaction), x$product, sep="*"), ifelse(x$tot == -1, paste("-", paste(as.character(x$reaction),x$product, sep="*"), sep=""), paste(as.character(x$tot), as.character(x$reaction), x$product, sep="*"))), t2=ifelse(x$tot == 1, paste(as.character(x$reaction), x$odeProduct, sep="*"), ifelse(x$tot == -1, paste("-", paste(as.character(x$reaction),x$odeProduct, sep="*"), sep=""), paste(as.character(x$tot), as.character(x$reaction), x$odeProduct, sep="*")))))
     
     # Now summarize everything per species
-    tmpDF2 <- ddply(tmpDF1, .variable=c("species", "odeSpecies"), function(x) data.frame(res1=paste(x$t1, sep="", collapse=" + "), res2=paste(x$t2, sep="", collapse=" + ")))
+    tmpDF2 <- plyr::ddply(tmpDF1, .variable=c("species", "odeSpecies"), function(x) data.frame(res1=paste(x$t1, sep="", collapse=" + "), res2=paste(x$t2, sep="", collapse=" + ")))
     
     # Final tuning - replace + - signs with -, etc.
-    tmpDF1 <- ddply(tmpDF2, .variable=c("species", "odeSpecies"), function(x) data.frame(model=str_replace_all(as.character(x$res1), "\\+ \\-", "- "), equation=str_replace_all(as.character(x$res2), "\\+ \\-", "- ")))
+    tmpDF1 <- plyr::ddply(tmpDF2, .variable=c("species", "odeSpecies"), function(x) data.frame(model=stringr::str_replace_all(as.character(x$res1), "\\+ \\-", "- "), equation=stringr::str_replace_all(as.character(x$res2), "\\+ \\-", "- ")))
     
     # Add model equations to the model
     y$model <- paste("d_", as.character(tmpDF1$species), " <- ", as.character(tmpDF1$model), sep="")    
@@ -91,7 +138,7 @@ makeModel.function <- function(x){
     # Check if all species are used - TDB
     
     # Create ODEs
-    y$odes <- list(equations=paste(paste("r[", 1:nrow(tmpDF1), "]", sep=""), " <- ", as.character(tmpDF1$equation), " - d", as.character(tmpDF1$odeSpecies), sep=""), rates=makeODERates(x), parameters=makeODEParameters(x), rules=makeODERules(x,nrow(tmpDF1)))
+    y$odes <- list(equations=paste(paste("r[", 1:nrow(tmpDF1), "]", sep=""), " <- ", as.character(tmpDF1$equation), " - d", as.character(tmpDF1$odeSpecies), sep=""), rates=makeODERates(x), parameters=makeODEParameters(x), rules=makeODERules(x,tmpDF1))
     
     # Mark the model as OK
     y$isChecked <- 1
@@ -104,5 +151,5 @@ makeModel.function <- function(x){
   }      
 }
 
-makeModel <- cmpfun(makeModel.function)
-rm(makeModel.function)
+#makeModel <- cmpfun(makeModel.function)
+#rm(makeModel.function)

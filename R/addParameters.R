@@ -1,16 +1,43 @@
-# addSpecies function adds species into an existing model.
-# It also provides option to specify the species initial
-# value (if not specified, it assumes that the value is 0).
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Adding parameters
+#' 
+#' This function allows users to specify values of parameters used in the reaction (if parameters are used). The current 
+#' sysBio version assumes that parameters, if defined, will remain constant during simulation. Thus, only numerical values 
+#' can be assigned to parameter values.
+#' 
+#' @param x  model to which the parameter is added (required)
+#' @param pName parameter name (required)
+#' @param iVal parameter value; if the value is not specified, sysBio will set it to 1
+#' @param overwrite a flag that allows changes to the existing parameter (default value FALSE)
+#'     
+#' @return This function adds information about parameters into the model (given as a first argument of the function). 
+#'     Parameters information is stored in the list format and contain the following elements:
+#'     \itemize{
+#'     \item{parameters$pName - parameter name}
+#'     \item{parameters$initVal - parameter value}
+#'     }
+#'     
+#' @examples
+#' exmp <- newModel("This is an example of a new model")
+#' addMAreaction(exmp, react="A = null", "rf", "rb")
+#' addMAreaction(exmp, react="A + B -> 2*AB", "k", name="Forward AB")
+#' addMAreaction(exmp, react="AB -> null", "rAB")
+#' 
+#' addMAreactRate(exmp, "rf", "fixed", "1")
+#' addMAreactRate(exmp, "rb", "fixed", "0.75")
+#' addMAreactRate(exmp, "k", "fixed", "0.5")
+#' addMAreactRate(exmp, "rAB", "assigned", "p1*A")
+#' 
+#' addParameters(exmp, "p1", 0.75)
+#'  
+#' # Show info about model reactions and parameters
+#' exmp$reaction
+#' exmp$parameters
+#' 
+#' @export
+#' 
 
-addParameters.function <- function(x, pName=NA, iVal="0", overwrite=FALSE){
+#addParameters.function <- function(x, pName=NA, iVal="1", overwrite=FALSE){
+addParameters <- function(x, pName=NA, iVal="1", overwrite=FALSE){
   
   if (!exists(deparse(substitute(x))))
     stop("Specified model does not exist!")
@@ -55,5 +82,5 @@ addParameters.function <- function(x, pName=NA, iVal="0", overwrite=FALSE){
   assign(deparse(substitute(x)), y, envir = .GlobalEnv)  
 }
 
-addParameters <- cmpfun(addParameters.function)
-rm(addParameters.function)
+#addParameters <- cmpfun(addParameters.function)
+#rm(addParameters.function)

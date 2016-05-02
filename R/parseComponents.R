@@ -1,15 +1,17 @@
-# parseComponents function parses components of a reaction. 
-# This function is called from the "parseReaction" function.
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Parsing reaction components
+#' 
+#' This function parses components of a reaction. This function is called from the "parseReaction.R" function.
+#' 
+#' @param model  model name (required)
+#' @param components a vector that contain left and right side of the reaction (required)
+#' @param rate reaction rate (required)
+#'     
+#' @return This function returns a data frame that contains parsed components of a reaction.
+#'   
 
-parseComponents.function <- function(model, components, rate){
+
+#parseComponents.function <- function(model, components, rate){
+parseComponents <- function(model, components, rate){
   
   # Get components (species) from each side of the reaction
   hlp1 <- sapply(1:length(components), function(y) {strsplit(components[y], "\\+")})
@@ -19,10 +21,10 @@ parseComponents.function <- function(model, components, rate){
   {
     # Check how many components (species) are on each side of the reaction
     hlp2 <- unlist(hlp1)
-    hlp3 <- laply(hlp1, length)
+    hlp3 <- plyr::laply(hlp1, length)
     
     # Get the quantity, sign, and rate for the species in the reaction (based on the side of species in the reaction)
-    hlp4 <- ldply(1:length(hlp2), function(y) {speciesDetails(hlp2[y])})
+    hlp4 <- plyr::ldply(1:length(hlp2), function(y) {speciesDetails(hlp2[y])})
     hlp4 <- cbind(hlp4, side=c(rep(-1, times = hlp3[1]), rep(1, times = hlp3[2]))) 
     hlp4 <- cbind(hlp4, rRate=c(rep(rate, times = hlp3[1]+ hlp3[2])))
     
@@ -68,5 +70,5 @@ parseComponents.function <- function(model, components, rate){
   
 }
 
-parseComponents <- cmpfun(parseComponents.function)
-rm(parseComponents.function)
+#parseComponents <- cmpfun(parseComponents.function)
+#rm(parseComponents.function)

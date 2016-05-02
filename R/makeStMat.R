@@ -1,25 +1,26 @@
-# makeStMat function parses the components of reactions and transforms them into a
-# matrix format required for the stochastic simulation
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Creating a stochastic matrix
+#' 
+#' This function creates a stochastic matrix of the model (required for the stochastic simulation)
+#' This function is called from the "makeModel.R" function.
+#' 
+#' @param x  model name (required)
+#' @param tmpDF a data frame that contains information about reactions, species, stoichometric coefficients, etc. 
+#'     (temp data frame used within the "makeModel.R" function) (required)
+#'     
+#' @return This function returns a stochastic matrix that corresponds to a defined model.
 
-makeStMat.function <- function(x, tmpDF){
+#makeStMat.function <- function(x, tmpDF){
+makeStMat <- function(x, tmpDF){
   
   if (!exists(deparse(substitute(x))))
     stop("Specified model does not exist!")
   
  # Calculate "amounts" of each species per reaction
- tmpDF.hlp <- ddply(tmpDF, .variable=c("reactionNumber", "species"), function(x) data.frame(tot=sum(as.numeric(x$stoch)*as.numeric(x$side))))     
+ tmpDF.hlp <- plyr::ddply(tmpDF, .variable=c("reactionNumber", "species"), function(x) data.frame(tot=sum(as.numeric(x$stoch)*as.numeric(x$side))))     
  tmpDF.hlp2 <- tmpDF.hlp[as.numeric(tmpDF.hlp$tot) != 0, ]
  
  # Transform the numbers into a matrix
- matrix.hlp <- acast(tmpDF.hlp2, species~reactionNumber, value.var="tot", fill=0)
+ matrix.hlp <- reshape2::acast(tmpDF.hlp2, species~reactionNumber, value.var="tot", fill=0)
  
  # Check the size of the matrix. 
  # It is possible for daply to return an array instead of matrix, in case there is only a single species (e.g., zero order reaction)
@@ -34,5 +35,5 @@ makeStMat.function <- function(x, tmpDF){
 
 }
 
-makeStMat <- cmpfun(makeStMat.function)
-rm(makeStMat.function)
+#makeStMat <- cmpfun(makeStMat.function)
+#rm(makeStMat.function)
