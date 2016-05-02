@@ -11,9 +11,4 @@ To install the sysBio package, run the following command:
     library("sysBio")
 
 ## Questions or help
-
 To report a bug, problem, or question, please open an issue.
-
-## License
-
-[MIT license](https://opensource.org/licenses/MIT)
