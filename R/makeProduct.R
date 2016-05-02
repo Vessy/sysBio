@@ -1,21 +1,21 @@
-# makeProduct function creates the product for all of the species.
-# This function is called from the "parseComponents" function.
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Creating a product for reaction species
+#' 
+#' This function creates the product form for all of the species. It is called from the "parseComponents.R" function.
+#' 
+#' @param dfTmp  a data frame that contains
+#' @param whichOne  a flag that determines whether to use the reactant/species (e.g., A) (flag set to 1) or 
+#'     a derivative of the reactant (e.g., dA) in the equation (flag != 1)
+#'     
+#' @return This function returns a product form for a reactant/species from the reactions
+#'  
 
-
-makeProduct.function <- function(dfTmp, whichOne){
+#makeProduct.function <- function(dfTmp, whichOne){
+makeProduct <- function(dfTmp, whichOne){  
   
-  # Find rows that contain species found on the left side of the reaction
+# Find rows that contain species found on the left side of the reaction
   mp.1 <- dfTmp[dfTmp$side == -1,]
   
-  # whichOne determines whether to use the reactant (A) or derivative of derivative (dA) in the equation
+  # whichOne determines whether to use the reactant/species (A) or derivative of derivative (dA) in the equation
   if (whichOne == 1){
     # First one
     hlp <- ifelse(mp.1$V1[1] == 1, mp.1$V2[1], paste(mp.1$V2[1], mp.1$V1[1], sep="^"))
@@ -36,5 +36,5 @@ makeProduct.function <- function(dfTmp, whichOne){
   hlp
 }
 
-makeProduct <- cmpfun(makeProduct.function)
-rm(makeProduct.function)
+#makeProduct <- cmpfun(makeProduct.function)
+#rm(makeProduct.function)

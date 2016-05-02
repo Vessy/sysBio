@@ -1,15 +1,15 @@
-# speciesDetails function provides info abour species included in the model,
-# e.g., species names and their initial values.
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Get info abour species included in the reaction
+#' 
+#' This function returns info about species included in the reaction (species name and the corresponding stoichometric coefficient). 
+#' It is called within the "parseComponents.R" function
+#' 
+#' @param x  a model name
+#'
+#' @return A vector that contains species name and the corresponding stoichometric coefficient
+#'   
 
-speciesDetails.function <- function(x){  
+#speciesDetails.function <- function(x){  
+speciesDetails <- function(x){
   
   # Assumes format k*species
   hlp <- unique(unlist(strsplit(x , split="[*)( ]")))
@@ -28,6 +28,6 @@ speciesDetails.function <- function(x){
   c(species.value, species.name)
 }
 
-speciesDetails <- cmpfun(speciesDetails.function)
-rm(speciesDetails.function)
+#speciesDetails <- cmpfun(speciesDetails.function)
+#rm(speciesDetails.function)
 

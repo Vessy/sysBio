@@ -1,18 +1,15 @@
-# makeODEs function transforms ODEs describing the giving model into the R 
-# format required by ODE solver.
-# in a given time interval.
-# This function is called from the "simulateModel.R" function.
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Creating a residual function for the ODEs solver
+#' 
+#' This function  creates a residual function that will be used within the ODEs solver. 
+#' This function is called from the "simulateModel.R" function
+#' 
+#' @param x  model name (required)
+#'     
+#' @return A residual function that will be used within the ODEs solver.
+#'  
 
-
-makeODEs.function <- function(x){
+#makeODEs.function <- function(x){
+makeODEs <- function(x){
   
   if (!exists(deparse(substitute(x))))
     stop("Specified model does not exist!")
@@ -31,7 +28,27 @@ makeODEs.function <- function(x){
     parameters.length <- length(x$odes$parameters)
     rates.length <- length(x$odes$rates)
     
-    odes.length <- length(x$odes$equations) + length(x$odes$rules)
+    # Merge equations for rules and rates (if there are species that have equations in both)
+    
+    r_reactions <- strsplit(x$odes$equations, " <- ")
+    r_reactions.df <- do.call(rbind.data.frame, r_reactions)
+    colnames(r_reactions.df) <- c("react", "product")
+   
+    
+    if (length(x$odes$rules) > 0){
+      
+      r_rules <- strsplit(x$odes$rules, " <- ")
+      r_rules.df <- do.call(rbind.data.frame, r_rules)
+      colnames(r_rules.df) <- c("react", "product")
+      
+      odes.all <- plyr::ddply(rbind(r_reactions.df, r_rules.df), .variable=c("react"), function(x) data.frame(productAll = paste(paste("(", x$product, ")", sep=""), sep="", collapse=" + ")))
+   
+    } else {
+      odes.all <-r_reactions.df
+      colnames(odes.all) <- c("react", "productAll")
+    }
+    
+    odes.length <- length(odes.all)
     
     if ((parameters.length > 0) & (rates.length > 0)){
       hlpFun <- function(t, y, dy, params){
@@ -42,7 +59,8 @@ makeODEs.function <- function(x){
         
         eval(parse(text=paste(as.character(x$rates$rrName), " <- " , x$odes$rates, sep="")))
         
-        eval(parse(text=c(x$odes$equations, x$odes$rules)))
+        #eval(parse(text=c(x$odes$equations, x$odes$rules)))
+        eval(parse(text=paste(as.character(odes.all$react), " <- " , as.character(odes.all$productAll), sep="")))
         
         list(r)
       }
@@ -55,7 +73,9 @@ makeODEs.function <- function(x){
         
         eval(parse(text=paste(as.character(x$rates$rrName), " <- " , x$odes$rates, sep="")))
         
-        eval(parse(text=c(x$odes$equations, x$odes$rules)))
+        #eval(parse(text=c(x$odes$equations, x$odes$rules)))
+        eval(parse(text=paste(as.character(odes.all$react), " <- " , as.character(odes.all$productAll), sep="")))
+        
         
         list(r)
       }
@@ -68,5 +88,5 @@ makeODEs.function <- function(x){
   hlpFun  
 }
 
-makeODEs <- cmpfun(makeODEs.function)
-rm(makeODEs.function)
+#makeODEs <- cmpfun(makeODEs.function)
+#rm(makeODEs.function)

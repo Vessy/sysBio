@@ -1,16 +1,43 @@
-# printInfo function prints out info about model, e.g.,  
-# name, number of reactions and their types, numper of species,
-# number of ODEs, etc.
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Print information about the model
+#' 
+#' This function prints out info about mode: model name, number of reactions and their types, number of species, and number of ODEs required to
+#' represent the model. It also allows users to print detailed info about each of the reactions, species, reaction rates, parameters, rules, 
+#' and model equations.
+#' 
+#' @param x a model name
+#' @param allDetails a flag that specify whether the user wants short or long description of the model (flag set to FALSE).
+#' 
+#' @return Textual summary
+#' 
+#' @examples
+#' exmp <- newModel("This is an example of a new model")
+#' addMAreaction(exmp, react="A = null", "rf", "rb")
+#' addMAreaction(exmp, react="A + B -> 2*AB", "k", name="Forward AB")
+#' addMAreaction(exmp, react="AB -> null", "rAB")
+#' 
+#' addMAreactRate(exmp, "rf", "fixed", "1")
+#' addMAreactRate(exmp, "rb", "fixed", "0.75")
+#' addMAreactRate(exmp, "k", "fixed", "0.5")
+#' addMAreactRate(exmp, "rAB", "assigned", "p1*A")
+#' 
+#' addParameters(exmp, "p1", 0.75)
+#'  
+#' addSpecies(exmp, "A", 10)
+#' addSpecies(exmp, "B", 10)
+#' addSpecies(exmp, "AB", 0)
+#' 
+#' addRule(exmp, "rule B", "ODEs", "B=-0.1*AB")
+#' 
+#' makeModel(exmp)
+#'   
+#' printInfo(exmp)
+#' printInfo(exmp, allDetails=TRUE)
+#' 
+#' @export
+#' 
 
-printInfo.function <- function(x, allDetails=FALSE){
+#printInfo.function <- function(x, allDetails=FALSE){
+printInfo <- function(x, allDetails=FALSE){
   
   if (!exists(deparse(substitute(x))))
     stop("Specified model does not exist!")
@@ -51,5 +78,5 @@ printInfo.function <- function(x, allDetails=FALSE){
   } 
 }
 
-printInfo <- cmpfun(printInfo.function)
-rm(printInfo.function)
+#printInfo <- cmpfun(printInfo.function)
+#rm(printInfo.function)

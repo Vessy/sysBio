@@ -1,15 +1,20 @@
-# parseReaction function parses reaction and transforms the canonical form of
-# a mass action reaction into a format that can be used to describe them as ODEs.
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Parsing reactions
+#' 
+#' This function parses eaction and transforms the canonical form of a mass action reaction 
+#' into a format that can be used to describe them as ODEs. This function is called from the
+#' "parseReaction.R" function.
+#' 
+#' @param model  model name (required)
+#' @param reaction reaction (forward reaction only) (required)
+#' @param rate reaction rate (required)
+#' @param rNumber number of reaction in the model; if reaction is reversible, this number will be defined in the following format:
+#'     reactionNumber_1 and reactionNumber_2 (required)
+#'     
+#' @return This function returns a data frame that contains parsed reaction.
+#' 
 
-parseReaction.function <- function(model, reaction, rate, rNumber){
+#parseReaction.function <- function(model, reaction, rate, rNumber){
+parseReaction <- function(model, reaction, rate, rNumber){
   
   hlp1 <- c()
   
@@ -29,5 +34,5 @@ parseReaction.function <- function(model, reaction, rate, rNumber){
   hlp1  
 }
 
-parseReaction <- cmpfun(parseReaction.function)
-rm(parseReaction.function)
+#parseReaction <- cmpfun(parseReaction.function)
+#rm(parseReaction.function)

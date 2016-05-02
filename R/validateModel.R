@@ -1,16 +1,40 @@
-# validateModel function validates model, i.e., checks if all reactions, parameters, rates, events, etc., 
-# are incoorporated into a model (ODEs), as well as whether variables have assigned values (or functions).
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Print information about the model
+#' 
+#' This function validates model, i.e., checks if all reactions, parameters, rates, rules, etc., are 
+#' incoorporated into a model, as well as whether all variables have assigned values (either constant or in a form of a function).
+#' 
+#' @param x a model name
+#' 
+#' @return Numeric value - 1 if model has been validated, 0 if validation failed
+#' 
+#' @examples
+#' exmp <- newModel("This is an example of a new model")
+#' addMAreaction(exmp, react="A = null", "rf", "rb")
+#' addMAreaction(exmp, react="A + B -> 2*AB", "k", name="Forward AB")
+#' addMAreaction(exmp, react="AB -> null", "rAB")
+#' 
+#' addMAreactRate(exmp, "rf", "fixed", "1")
+#' addMAreactRate(exmp, "rb", "fixed", "0.75")
+#' addMAreactRate(exmp, "k", "fixed", "0.5")
+#' addMAreactRate(exmp, "rAB", "assigned", "p1*A")
+#' 
+#' addParameters(exmp, "p1", 0.75)
+#'  
+#' addSpecies(exmp, "A", 10)
+#' addSpecies(exmp, "B", 10)
+#' addSpecies(exmp, "AB", 0)
+#' 
+#' addRule(exmp, "rule B", "ODEs", "B=-0.1*AB")
+#' 
+#' makeModel(exmp)
+#'   
+#' validateModel(exmp)
+#' 
+#' @export
+#' 
 
-# Check if all varaibales are defined
-validateModel.function <- function(x){
+#validateModel.function <- function(x){
+validateModel <- function(x){
   
   if (!exists(deparse(substitute(x))))
     stop("Specified model does not exist!")
@@ -39,7 +63,7 @@ validateModel.function <- function(x){
     hlp1 <- unique(unlist(sapply(1:numR , function(y) {strsplit(hlp0, split="[-+*/=)( ]|[^x][0-9]+|^[0-9]+")})))
     rule.all <- hlp1[(hlp1 != "")]
     
-    everythingDefined <- c(x$species$sName, x$reaction$r1, x$reaction$r2, x$species$sName, x$rates$rrName)
+    everythingDefined <- c(x$species$sName, x$reaction$r1, x$reaction$r2, x$species$sName, x$rates$rrName, x$parameters$pName)
     
     if (length(setdiff(rule.all, everythingDefined)) != 0){
       print("Problem with rules - not all species/rates/parameters used in the rules are defined... ")
@@ -65,7 +89,7 @@ validateModel.function <- function(x){
     # Remove numbers from the results (cases like 5*A would be split as 5 and A)
     # This step may return a warning:
     # "Warning message: NAs introduced by coercion" 
-    hlp2 <- hlp3[is.na(as.numeric(hlp3))]
+    hlp2 <- suppressWarnings(hlp3[is.na(as.numeric(hlp3))])
     
     numSp <- setdiff(hlp2, "null") # remove null from the reactions
     
@@ -116,8 +140,12 @@ validateModel.function <- function(x){
       remove.nums <- hlp2.7[!sapply(hlp2.7, is.numeric)]
         
       numSp.assigned <- setdiff(remove.nums, x$species$sName)
+      # This step may return a warning:
+      # "Warning message: NAs introduced by coercion" 
+      hlpR <- suppressWarnings(numSp.assigned[is.na(as.numeric(numSp.assigned))])
+      whatsIn <- hlpR[(hlpR != "")]
         
-      if (length(setdiff(numSp.assigned, x$parameters$pName)) != 0){
+      if (length(setdiff(whatsIn, x$parameters$pName)) != 0){
         print("Problem with rates - not all paramaters assigned to rates are defined... ")
         isValidated <- 0
       }
@@ -143,7 +171,7 @@ validateModel.function <- function(x){
     hlp2.4 <- unlist(sapply(1:length(hlp2.3), function(y) {strsplit(hlp2.3[y], "\\&")}))
     hlp2.5 <- unique(unlist(sapply(1:length(hlp2.4), function(y) {strsplit(hlp2.4[y], "\\|")})))
     
-    remove.nums <- hlp2.5[!sapply(hlp2.5, is.numeric)]
+    remove.nums <- suppressWarnings(hlp2.5[!sapply(hlp2.5, is.numeric)])
     
     if (length(setdiff(remove.nums, c(x$species$sName, "time"))) != 0){
       print(" Problem with events - not all paramaters within condition are defined... ")
@@ -162,7 +190,7 @@ validateModel.function <- function(x){
     hlp2.6 <- unlist(sapply(1:length(hlp2.5), function(y) {strsplit(hlp2.5[y], "\\^")}))
     hlp2.7 <- unique(unlist(sapply(1:length(hlp2.6), function(y) {strsplit(hlp2.6[y], "\\log")})))
     
-    remove.nums <- hlp2.7[!sapply(hlp2.7, is.numeric)]
+    remove.nums <- suppressWarnings(hlp2.7[!sapply(hlp2.7, is.numeric)])
       
     if (length(setdiff(remove.nums, c(x$parameters$pName, x$rates$rrName, x$species$sName))) != 0){
       print(" Problem with events - not all paramaters within condition are defined... ")
@@ -180,5 +208,5 @@ validateModel.function <- function(x){
   
 }
 
-validateModel<- cmpfun(validateModel.function)
-rm(validateModel.function)
+#validateModel<- cmpfun(validateModel.function)
+#rm(validateModel.function)

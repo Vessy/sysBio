@@ -1,10 +1,27 @@
 Package: sysBio
 Type: Package
-Title: Systems biology modeling
-Version: 1.0
+Title: A package for modeling biological systems
+Version: 1.0.0
 Date: 2016-04-18
-Author: Vesna Memisevic <vesna@vesnam.com> 
-Maintainer: Vesna Memisevic <vesna@vesnam.com> 
-Description: Modeling dynamical biological systems using differential equations
-Imports: compiler, stringr, plyr, deSolve, ggplot2, FillespieSSA, reshape2
-License: GPL (>= 3)
+Authors@R: c(person("Vesna", "Memisevic", email = "vesna@vesnam.com",
+  role = c("aut", "cre")), person("Kenneth", "Daily", email = "kmdaily@gmail.com",
+  role = "ctb"))
+Maintainer: Vesna Memisevic <vesna@vesnam.com>
+Description: A package for modeling and simulation of biological systems. 
+    It provides ability to convert reactions into ordinary differential equations (ODEs)
+    and solve them via numerical integration or stochastic simulation. 
+BugReports: https://github.com/Vessy/sysBio/issues
+URL: https://github.com/Vessy/sysBio
+Imports:
+    stringr (>= 1.0.0),
+    plyr (>= 1.8.3),
+    deSolve (>= 1.13),
+    ggplot2 (>= 2.1.0),
+    GillespieSSA (>= 0.5-4),
+    reshape2 (>= 1.4.1)
+License: MIT
+LazyData: true
+RoxygenNote: 5.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr

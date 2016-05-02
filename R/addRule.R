@@ -1,15 +1,51 @@
-# addRule function adds a rule into an existing model.
-# A rule defines a change in a species values that depends on other species or parameters. 
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Adding rules
+#' 
+#' This function allows user to define rules. Rules can be used to specify values for model species 
+#' based on the values of other components (mainly species) in the model. Current version allows only 
+#' for the ODEs type of rules.
+#' 
+#' @param x  model to which the rule is added (required)
+#' @param rName - rule name (required)
+#' @param type rule type; currently only type ODEs is supported (rules in the form of ODEs) (required)
+#' @param rule rule definition (required)
+#' @param overwrite a flag that allows changes to the existing rule (default value FALSE)
+#'     
+#' @return This function adds information about rules into the model (given as a first argument of the function). 
+#'     Rules information is stored in the list format and contain the following elements:  
+#'     \itemize{
+#'     \item{rule$rName - rule name}
+#'     \item{rule$rType - rule type (ODEs)}
+#'     \item{rule$rRule - rule definition}
+#'     }
+#'     
+#' @examples
+#' exmp <- newModel("This is an example of a new model")
+#' addMAreaction(exmp, react="A = null", "rf", "rb")
+#' addMAreaction(exmp, react="A + B -> 2*AB", "k", name="Forward AB")
+#' addMAreaction(exmp, react="AB -> null", "rAB")
+#' 
+#' addMAreactRate(exmp, "rf", "fixed", "1")
+#' addMAreactRate(exmp, "rb", "fixed", "0.75")
+#' addMAreactRate(exmp, "k", "fixed", "0.5")
+#' addMAreactRate(exmp, "rAB", "assigned", "p1*A")
+#' 
+#' addParameters(exmp, "p1", 0.75)
+#'  
+#' addSpecies(exmp, "A", 10)
+#' addSpecies(exmp, "B", 10)
+#' addSpecies(exmp, "AB", 0)
+#' 
+#' addRule(exmp, "rule B", "ODEs", "B=-0.1*AB")
+#'   
+#' # Show info about model reactions and rules
+#' exmp$reaction
+#' exmp$rule
+#' 
+#' @export
+#' 
 
-addRule.function <- function(x, rName=NA, type=NA, rule=NA, overwrite=FALSE){
+#addRule.function <- function(x, rName=NA, type=NA, rule=NA, overwrite=FALSE){
+addRule <- function(x, rName=NA, type=NA, rule=NA, overwrite=FALSE){
   
   if (!exists(deparse(substitute(x))))
     stop("Specified model does not exist!")
@@ -64,6 +100,6 @@ addRule.function <- function(x, rName=NA, type=NA, rule=NA, overwrite=FALSE){
   assign(deparse(substitute(x)), y, envir = .GlobalEnv)  
 }
 
-addRule <- cmpfun(addRule.function)
-rm(addRule.function)
+#addRule <- cmpfun(addRule.function)
+#rm(addRule.function)
 

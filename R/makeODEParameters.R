@@ -1,16 +1,16 @@
-# makeODEParameters function creates assignment (in the format required for ODE solver)
-# for each each of the specidied paramterer based on its assigned/specified value.
-# This function is called from the "makeModel.R" function.
-#
-# This file is part of the R sysBio package. 
-#
-# sysBio package is free software and is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
+#' Creating representation for reaction parameters
+#' 
+#' This function creates assignment (in the format required for ODE solver) for each each of the specified 
+#' paramterers based on their assigned/specified value. This function is called from the "makeModel.R" function.
+#' 
+#' @param x  model name (required)
+#'     
+#' @return This function returns model parameters in the format appropriate for the ODEs solver
+#'     
 
-makeODEParameters.function <- function(x){
+
+#makeODEParameters.function <- function(x){
+makeODEParameters <- function(x){
   
   hlp <- c()
   
@@ -25,5 +25,5 @@ makeODEParameters.function <- function(x){
   hlp
 }
 
-makeODEParameters <- cmpfun(makeODEParameters.function)
-rm(makeODEParameters.function)
+#makeODEParameters <- cmpfun(makeODEParameters.function)
+#rm(makeODEParameters.function)
